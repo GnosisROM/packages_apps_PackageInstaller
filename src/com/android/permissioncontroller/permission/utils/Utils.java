@@ -23,8 +23,11 @@ import static android.Manifest.permission_group.CALENDAR;
 import static android.Manifest.permission_group.CALL_LOG;
 import static android.Manifest.permission_group.CAMERA;
 import static android.Manifest.permission_group.CONTACTS;
+import static android.Manifest.permission_group.FAKE_PACKAGE;
 import static android.Manifest.permission_group.LOCATION;
 import static android.Manifest.permission_group.MICROPHONE;
+import static android.Manifest.permission_group.NETWORK;
+import static android.Manifest.permission_group.OTHER_SENSORS;
 import static android.Manifest.permission_group.PHONE;
 import static android.Manifest.permission_group.SENSORS;
 import static android.Manifest.permission_group.SMS;
@@ -144,6 +147,9 @@ public final class Utils {
      */
     public static final long ONE_TIME_PERMISSIONS_TIMEOUT_MILLIS = 1 * 60 * 1000; // 1 minute
 
+    /** Mapping permission -> group for all special runtime permissions */
+    private static final ArrayMap<String, String> SPECIAL_RUNTIME_PERMISSIONS;
+
     /** Mapping permission -> group for all dangerous platform permissions */
     private static final ArrayMap<String, String> PLATFORM_PERMISSIONS;
 
@@ -208,6 +214,15 @@ public final class Utils {
         PLATFORM_PERMISSIONS.put(Manifest.permission.CAMERA, CAMERA);
 
         PLATFORM_PERMISSIONS.put(Manifest.permission.BODY_SENSORS, SENSORS);
+
+        PLATFORM_PERMISSIONS.put(Manifest.permission.FAKE_PACKAGE_SIGNATURE, FAKE_PACKAGE);
+
+        PLATFORM_PERMISSIONS.put(Manifest.permission.INTERNET, NETWORK);
+        PLATFORM_PERMISSIONS.put(Manifest.permission.OTHER_SENSORS, OTHER_SENSORS);
+
+        SPECIAL_RUNTIME_PERMISSIONS = new ArrayMap<>();
+        SPECIAL_RUNTIME_PERMISSIONS.put(Manifest.permission.INTERNET, NETWORK);
+        SPECIAL_RUNTIME_PERMISSIONS.put(Manifest.permission.OTHER_SENSORS, OTHER_SENSORS);
 
         PLATFORM_PERMISSION_GROUPS = new ArrayMap<>();
         int numPlatformPermissions = PLATFORM_PERMISSIONS.size();
@@ -637,6 +652,28 @@ public final class Utils {
      */
     public static boolean isRuntimePlatformPermission(@NonNull String permission) {
         return PLATFORM_PERMISSIONS.containsKey(permission);
+    }
+
+    /**
+     * Is the permission a special runtime permission?
+     * These are treated as a runtime permission even for legacy apps. They
+     * need to be granted by default for all apps to maintain compatibility.
+     *
+     * @return whether the permission is a special runtime permission.
+     */
+    public static boolean isSpecialRuntimePermission(@NonNull String permission) {
+        return SPECIAL_RUNTIME_PERMISSIONS.containsKey(permission);
+    }
+
+    /**
+     * Is the permission group a special runtime permission group?
+     * These are treated as a runtime permission even for legacy apps. They
+     * need to be granted by default for all apps to maintain compatibility.
+     *
+     * @return whether the permission group is a special runtime permission group.
+     */
+    public static boolean isSpecialRuntimePermissionGroup(@NonNull String permissionGroup) {
+        return SPECIAL_RUNTIME_PERMISSIONS.containsValue(permissionGroup);
     }
 
     /**
